@@ -4,3 +4,8 @@ body {
   background: linear-gradient(to right, #4CA1AF, #2C3E50); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   
 }
+
+#formulario {
+  margin: 0 auto;
+  max-width: 90%;
+}
