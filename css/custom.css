@@ -9,3 +9,17 @@ body {
   margin: 0 auto;
   max-width: 90%;
 }
+
+@media (min-width: 768px) { 
+  .card-flex {
+    display: flex;
+    align-items: center;    
+    gap: 20px;
+    justify-content: space-between;
+  }
+
+  .p-flex {
+    display: flex;
+    align-items: center;
+  }
+}
