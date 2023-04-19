@@ -1,5 +1,11 @@
 const resultado = document.querySelector('#resultado');
 const formulario = document.querySelector('#formulario');
+const paginacionDiv = document.querySelector('#paginacion');
+
+const registroPorPagina = 40;
+let totalPaginas;
+let iterador;
+let paginaActual = 1;
 
 window.onload = () => {
   formulario.addEventListener('submit', validarFormulario)
@@ -15,7 +21,7 @@ function validarFormulario(e) {
     return;
   }
 
-  buscarImagenes(terminoBusqueda);
+  buscarImagenes();
 }
 
 function mostrarAlerta(mensaje) {
@@ -41,20 +47,38 @@ function mostrarAlerta(mensaje) {
   }
 }
 
-function buscarImagenes(termino) {
+function buscarImagenes() {
+
+  const termino = document.querySelector("#termino").value;
+
   const key = "35049240-810631d43584f1c0d90607b80";
-  const url = `https://pixabay.com/api/?key=${key}&q=${termino}`;
+  const url = `https://pixabay.com/api/?key=${key}&q=${termino}&per_page=${registroPorPagina}&page=${paginaActual}`;
 
   fetch(url)
     .then(respuesta => respuesta.json())
     .then(resultado => {
+
+      totalPaginas = calcularPagina(resultado.totalHits);
+
+      // console.log(totalPaginas);
       mostrarImagenes(resultado.hits);
     })
 }
 
-function mostrarImagenes(imagenes) {
+// Generador que va a calcular la cantidad de páginas que hay de imagenes
+function* crearPaginador(total) {
+  for (let i = 1; i <= total; i++) {
+    yield i;
+  }
+}
 
-  console.log(imagenes);
+function calcularPagina(total) {
+  return parseInt(Math.ceil(total / registroPorPagina));
+}
+
+function mostrarImagenes(imagenes) {
+  // console.log(imagenes);
+
   while (resultado.firstChild) {
     resultado.removeChild(resultado.firstChild);
   }
@@ -64,7 +88,7 @@ function mostrarImagenes(imagenes) {
     const { previewURL, likes, views, largeImageURL } = imagen;
 
     resultado.innerHTML += `
-        <div class="w-1/2 md:w-1/3 lg:w-1/4 p-3 mb-3">
+        <div class="md:w-1/3 lg:w-1/4 p-3 mb-3 rounder">
           <div class="bg-white">
             <img class="w-full" src="${previewURL}">
             <div class="p-4">            
@@ -92,4 +116,37 @@ function mostrarImagenes(imagenes) {
         </div>
       `;
   })
+
+  // Limpiar el paginador previo
+  while (paginacionDiv.firstChild) {
+    paginacionDiv.removeChild(paginacionDiv.firstChild);
+  }
+
+  // Generamos el HTML5
+  imprimirPaginador();
+}
+
+function imprimirPaginador() {
+  iterador = crearPaginador(totalPaginas);
+
+  while (true) {
+    const { value, done } = iterador.next();
+
+    if (done) return;
+
+    // Caso contrario genera un boton por cada elemento en el generador 
+    const boton = document.createElement('a');
+    boton.href = "#";
+    boton.dataset.pagina = value;
+    boton.textContent = value;
+    boton.classList.add("Siguiente", "bg-yellow-400", "px-4", "py-1", "mr-2", "font-bold", "mb-4", "rounder");
+
+    boton.onclick = () => {
+      paginaActual = value;
+
+      buscarImagenes();
+    }
+
+    paginacionDiv.appendChild(boton);
+  }
 }
