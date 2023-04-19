@@ -44,12 +44,11 @@ body {
 }*/
 
 .container {
-  display: block;
+  display: grid;
 }
 
 @media (min-width: 460px) {
   .container {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
     margin-top: 1rem;
   }
